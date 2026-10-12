@@ -36,6 +36,28 @@
             color: #ffe4e1;
         }
 
+        /* Nút Bật/Tắt Nhạc Nền */
+        .music-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 105, 180, 0.3);
+            border: 1px solid #ff69b4;
+            color: white;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            transition: transform 0.2s;
+        }
+        .music-btn:hover {
+            transform: scale(1.1);
+        }
+
         /* KHUNG THƯ GIẤY MỞ RA ĐỂ ĐỌC */
         #letter-paper {
             position: absolute;
@@ -104,6 +126,14 @@
     </style>
 </head>
 <body>
+
+    <!-- THẺ PHÁT NHẠC NỀN ẨN -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="nhac.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- NÚT BẬT / TẮT NHẠC -->
+    <button class="music-btn" onclick="toggleMusic()">🎵</button>
 
     <div class="instruction">
         <h1 id="main-title">20/10 vui vẻ nhooo</h1>
@@ -571,19 +601,27 @@ Cảm ơn cậu vì đã luôn là một người bạn tuyệt vời. Chúc c�
                 const distX = Math.abs(touch.clientX - touchStartX);
                 const distY = Math.abs(touch.clientY - touchStartY);
 
-                // Nếu khoảng cách di chuyển < 10px thì tính là Chạm/Click (Tránh nhầm với Vuốt xoay 3D)
                 if (distX < 10 && distY < 10) {
                     handleInteract(touch.clientX, touch.clientY);
                 }
             }
         });
 
+        // HÀM MỞ HỘP QUÀ & KÍCH HOẠT NHẠC NỀN
         function openGift() {
             isOpen = true;
 
+            // PHÁT NHẠC NỀN NHAC.MP3
+            const music = document.getElementById('bg-music');
+            if (music) {
+                music.play().catch(err => console.log("Cần tương tác để phát nhạc:", err));
+            }
+
+            // Mở nắp hộp quà
             new TWEEN.Tween(lidGroup.position).to({ y: 10, z: -5 }, 1200).easing(TWEEN.Easing.Back.Out).start();
             new TWEEN.Tween(lidGroup.rotation).to({ x: -Math.PI / 3, y: Math.PI / 4 }, 1200).easing(TWEEN.Easing.Back.Out).start();
 
+            // Nhô thư 3D
             new TWEEN.Tween(envelopeGroup.scale).to({ x: 1, y: 1, z: 1 }, 1000).easing(TWEEN.Easing.Back.Out).start();
             new TWEEN.Tween(envelopeGroup.position).to({ y: 5 }, 1400).easing(TWEEN.Easing.Cubic.Out).start();
 
@@ -592,6 +630,16 @@ Cảm ơn cậu vì đã luôn là một người bạn tuyệt vời. Chúc c�
             setTimeout(() => {
                 openLetter();
             }, 1400);
+        }
+
+        // HÀM BẬT / TẮT NHẠC
+        function toggleMusic() {
+            const music = document.getElementById('bg-music');
+            if (music.paused) {
+                music.play();
+            } else {
+                music.pause();
+            }
         }
 
         function openLetter() {
